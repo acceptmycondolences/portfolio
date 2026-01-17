@@ -1,0 +1,41 @@
+@font-face {
+  src: url(/fonts/coming-soon/coming-soon-regular.ttf) format('truetype');
+  font-family: 'Coming Soon';
+  font-display: swap;
+  font-style: normal;
+  font-weight: 400;
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC,
+    U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  --font-family: 'Coming Soon', cursive;
+}
+
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  --font-family: var(--font-family);
+}
+
+@layer base {
+  * {
+    @apply border-zinc-600 outline-none;
+  }
+
+  :focus-visible {
+    @apply ring-2 ring-zinc-600 dark:ring-zinc-300;
+  }
+
+  ::selection {
+    @apply bg-zinc-600 text-orange-50;
+  }
+
+  body {
+    @apply bg-orange-50 font-family text-zinc-800 antialiased dark:bg-zinc-800 dark:text-orange-50;
+  }
+}
