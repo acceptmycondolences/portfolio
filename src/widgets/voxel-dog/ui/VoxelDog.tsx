@@ -128,7 +128,7 @@ export function VoxelDog() {
 
   return (
     <div
-      className="relative mx-auto -mt-17.5 -mb-22.5 flex size-72 items-center justify-center md:-mt-25.5 md:-mb-33.5 md:size-128 [&_svg]:pointer-events-none [&_svg]:absolute [&_svg]:top-0 [&_svg]:left-0 [&_svg]:shrink-0 [&_svg]:-translate-1/2 [&_svg]:animate-spin"
+      className="relative mx-auto -mt-17.5 -mb-22.5 flex size-72 items-center justify-center md:-mt-25.5 md:-mb-33.5 md:size-128 [&_svg]:pointer-events-none [&_svg]:absolute [&_svg]:top-1/2 [&_svg]:left-1/2 [&_svg]:shrink-0 [&_svg]:-translate-1/2 [&_svg]:animate-spin"
       ref={containerRef}
     >
       {isLoading && <IconLoader />}
