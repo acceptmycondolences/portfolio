@@ -1,6 +1,6 @@
 import type { JSX } from 'react'
 
-import { IconBrandGithub, IconBrandInstagram, IconBrandTelegram } from '~/shared/ui'
+import { IconBrandInstagram, IconBrandTelegram, IconPhone } from '~/shared/ui'
 
 interface SocialMedia {
   href: string
@@ -11,7 +11,7 @@ interface SocialMedia {
 
 const SOCIAL_MEDIA: SocialMedia[] = [
   {
-    href: 'https://t.me/acceptmycondolences/',
+    href: 'https://t.me/taleofbygoneyears/',
     icon: IconBrandTelegram,
     id: 1,
     label: 'Telegram',
@@ -24,10 +24,10 @@ const SOCIAL_MEDIA: SocialMedia[] = [
     label: 'Instagram',
   },
   {
-    href: 'https://github.com/acceptmycondolences/',
-    icon: IconBrandGithub,
+    href: 'tel:+998-99-882-96-16',
+    icon: IconPhone,
     id: 3,
-    label: 'Github',
+    label: 'Phone number',
   },
 ]
 
