@@ -7,7 +7,7 @@ draco.setDecoderConfig({ type: 'js' })
 
 draco.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/')
 
-export const loadGLTFModel = (scene: Scene, options = { castShadow: true, receiveShadow: true }) => {
+export function loadGLTFModel(scene: Scene, options = { castShadow: true, receiveShadow: true }) {
   const { castShadow, receiveShadow } = options
 
   return new Promise((resolve, reject) => {
@@ -45,8 +45,4 @@ export const loadGLTFModel = (scene: Scene, options = { castShadow: true, receiv
       },
     )
   })
-}
-
-export const easeOutCircular = (x: number) => {
-  return Math.sqrt(1 - Math.pow(x - 1, 4))
 }

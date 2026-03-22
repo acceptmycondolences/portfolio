@@ -1,21 +1,9 @@
-import { Link, type LinkProps } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
+
+import { ROUTES } from '~/widgets/navbar'
 
 import { useIsMobile } from '~/shared/lib'
 import { IconBrandGithub } from '~/shared/ui'
-
-interface Route {
-  id: number
-  label: string
-  to: LinkProps['to']
-}
-
-const ROUTES: Route[] = [
-  {
-    id: 1,
-    label: 'Projects',
-    to: '/projects',
-  },
-]
 
 interface NavbarProps {
   onClose?: () => void
@@ -28,7 +16,7 @@ export function Navbar({ onClose }: NavbarProps) {
     <nav className="md:ml-6">
       <ul className="flex flex-col gap-2 md:flex-row md:items-center">
         {ROUTES.map((route) => (
-          <li className="shrink-0" key={route.id}>
+          <li className="shrink-0" key={route.label}>
             <Link
               activeOptions={{ exact: true }}
               activeProps={{ className: 'bg-slate-500 md:bg-emerald-600 md:text-white' }}

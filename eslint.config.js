@@ -14,6 +14,7 @@ export default defineConfig([
   globalIgnores(['dist']),
   perfectionist.configs['recommended-natural'],
   ...pluginRouter.configs['flat/recommended'],
+  eslintConfigPrettier,
   {
     extends: [
       js.configs.recommended,
@@ -38,5 +39,4 @@ export default defineConfig([
       'perfectionist/sort-named-imports': 'off',
     },
   },
-  eslintConfigPrettier,
 ])

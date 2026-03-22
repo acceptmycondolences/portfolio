@@ -1,3 +1,5 @@
+export * from '~/pages/home/config/constants'
+export * from '~/pages/home/model/types'
 export * from '~/pages/home/ui/AboutSection'
 export * from '~/pages/home/ui/BioSection'
 export * from '~/pages/home/ui/GreetingSection'

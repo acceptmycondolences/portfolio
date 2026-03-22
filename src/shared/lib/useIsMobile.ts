@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react'
 
-const MOBILE_MEDIA_QUERY = 768
+const MOBILE_MEDIA_QUERY = '(max-width: 767px)'
 
-export const useIsMobile = () => {
-  const [isMobile, setIsMobile] = useState(window.innerWidth < MOBILE_MEDIA_QUERY)
+export function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(() => window.matchMedia(MOBILE_MEDIA_QUERY).matches)
 
   useEffect(() => {
-    const mediaQueryList = window.matchMedia(`(max-width: ${String(MOBILE_MEDIA_QUERY - 1)}px)`)
+    const mediaQueryList = window.matchMedia(MOBILE_MEDIA_QUERY)
 
-    const handleChange = () => {
-      setIsMobile(window.innerWidth < MOBILE_MEDIA_QUERY)
+    const handleChange = (event: MediaQueryListEvent) => {
+      setIsMobile(event.matches)
     }
 
     mediaQueryList.addEventListener('change', handleChange)
