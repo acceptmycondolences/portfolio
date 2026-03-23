@@ -22,7 +22,7 @@ export function Header() {
           to="/"
         >
           {theme === 'dark' ? <IconPaw /> : <IconPawFilled />}
-          Alibek Allanazarov
+          Allanazarov Alibek
         </Link>
 
         {!isMobile && <Navbar />}
