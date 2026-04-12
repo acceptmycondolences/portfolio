@@ -16,7 +16,7 @@ export function loadGLTFModel(scene: Scene, options = { castShadow: true, receiv
     loader.setDRACOLoader(draco)
 
     loader.load(
-      '/3d-model/voxel-dog.glb',
+      '/3D-models/voxel-dog.glb',
       (data) => {
         const object = data.scene
 
