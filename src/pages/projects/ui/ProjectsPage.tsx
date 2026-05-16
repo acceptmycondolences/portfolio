@@ -4,7 +4,7 @@ export function ProjectsPage() {
   return (
     <section className="py-8">
       <Container>
-        <p className="leading-7">Coming soon...</p>
+        <p className="leading-7">Coming soon…</p>
       </Container>
     </section>
   )

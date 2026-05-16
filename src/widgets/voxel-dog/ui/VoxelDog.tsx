@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/Addons.js'
@@ -13,7 +13,7 @@ export function VoxelDog() {
   const rendererRef = useRef<null | THREE.WebGLRenderer>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
 
-  const handleResize = useCallback(() => {
+  const handleResize = () => {
     const { current: renderer } = rendererRef
     const { current: container } = containerRef
 
@@ -23,7 +23,13 @@ export function VoxelDog() {
 
       renderer.setSize(width, height)
     }
-  }, [])
+  }
+
+  const handleResizeRef = useRef(handleResize)
+
+  useEffect(() => {
+    handleResizeRef.current = handleResize
+  })
 
   useEffect(() => {
     const { current: container } = containerRef
@@ -119,12 +125,16 @@ export function VoxelDog() {
   }, [])
 
   useEffect(() => {
-    window.addEventListener('resize', handleResize)
+    const handleWindowResize = () => {
+      handleResizeRef.current()
+    }
+
+    window.addEventListener('resize', handleWindowResize)
 
     return () => {
-      window.removeEventListener('resize', handleResize)
+      window.removeEventListener('resize', handleWindowResize)
     }
-  }, [handleResize])
+  }, [])
 
   return (
     <div
