@@ -7,4 +7,7 @@ export interface ThemeContextState {
   theme: Theme
 }
 
-export const ThemeContext = createContext<ThemeContextState>({ setTheme: () => null, theme: 'dark' })
+export const ThemeContext = createContext<ThemeContextState>({
+  setTheme: () => null,
+  theme: 'dark',
+})

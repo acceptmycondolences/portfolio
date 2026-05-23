@@ -11,9 +11,10 @@ export function ThemeProvider({
   children,
   defaultTheme = 'dark',
   storageKey = 'theme',
-  ...props
 }: PropsWithChildren & ThemeProviderProps) {
-  const [theme, setTheme] = useState(() => localStorage.getItem(storageKey) ?? defaultTheme)
+  const [theme, setTheme] = useState<Theme>(
+    () => (localStorage.getItem(storageKey) as Theme | undefined) ?? defaultTheme,
+  )
 
   useEffect(() => {
     const html = window.document.documentElement
@@ -30,14 +31,10 @@ export function ThemeProvider({
 
         localStorage.setItem(storageKey, theme)
       },
-      theme: theme as Theme,
+      theme,
     }),
     [storageKey, theme],
   )
 
-  return (
-    <ThemeContext value={value} {...props}>
-      {children}
-    </ThemeContext>
-  )
+  return <ThemeContext value={value}>{children}</ThemeContext>
 }
