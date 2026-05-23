@@ -1,3 +1,3 @@
 export function easeOutCircular(x: number) {
-  return Math.sqrt(1 - Math.pow(x - 1, 4))
+  return Math.sqrt(1 - Math.pow(x - 1, 2))
 }

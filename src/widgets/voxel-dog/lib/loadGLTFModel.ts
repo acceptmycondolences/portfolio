@@ -1,22 +1,32 @@
-import type { Scene } from 'three'
-import { DRACOLoader, GLTFLoader } from 'three/examples/jsm/Addons.js'
+import type { Object3D, Scene } from 'three'
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
-const draco = new DRACOLoader()
+interface ModelOptions {
+  castShadow: boolean
+  receiveShadow: boolean
+}
 
-draco.setDecoderConfig({ type: 'js' })
+const dracoLoader = new DRACOLoader()
 
-draco.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/')
+dracoLoader.setDecoderConfig({ type: 'js' })
+dracoLoader.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/')
 
-export function loadGLTFModel(scene: Scene, options = { castShadow: true, receiveShadow: true }) {
+const MODEL_URL = `${import.meta.env.BASE_URL}3D-models/voxel-dog.glb`
+
+export function loadGLTFModel(
+  scene: Scene,
+  options: ModelOptions = { castShadow: true, receiveShadow: true },
+): Promise<Object3D> {
   const { castShadow, receiveShadow } = options
 
   return new Promise((resolve, reject) => {
     const loader = new GLTFLoader()
 
-    loader.setDRACOLoader(draco)
+    loader.setDRACOLoader(dracoLoader)
 
     loader.load(
-      '/3D-models/voxel-dog.glb',
+      MODEL_URL,
       (data) => {
         const object = data.scene
 
@@ -39,9 +49,9 @@ export function loadGLTFModel(scene: Scene, options = { castShadow: true, receiv
       },
       undefined,
       (error) => {
-        if (error instanceof Error) {
-          reject(error)
-        }
+        reject(
+          error instanceof Error ? error : new Error('Failed to load the voxel model of the dog.', { cause: error }),
+        )
       },
     )
   })

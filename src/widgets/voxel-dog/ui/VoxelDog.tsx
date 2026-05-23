@@ -1,138 +1,181 @@
 import { useEffect, useRef, useState } from 'react'
 
-import * as THREE from 'three'
-import { OrbitControls } from 'three/examples/jsm/Addons.js'
+import { AmbientLight, OrthographicCamera, Scene, SRGBColorSpace, Vector3, WebGLRenderer, type Object3D } from 'three'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
-import { easeOutCircular, loadGLTFModel } from '~/widgets/voxel-dog'
+import { disposeModel, easeOutCircular, loadGLTFModel } from '~/widgets/voxel-dog'
 
 import { IconLoader } from '~/shared/ui'
 
+const MAX_PIXEL_RATIO = 2
+const INTRO_DURATION_MS = 1600
+
 export function VoxelDog() {
   const [isLoading, setIsLoading] = useState(true)
+  const [hasError, setHasError] = useState(false)
 
-  const rendererRef = useRef<null | THREE.WebGLRenderer>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
 
-  const handleResize = () => {
-    const { current: renderer } = rendererRef
+  useEffect(() => {
     const { current: container } = containerRef
 
-    if (renderer && container) {
-      const width = container.clientWidth
-      const height = container.clientHeight
-
-      renderer.setSize(width, height)
+    if (!container) {
+      return
     }
-  }
 
-  const handleResizeRef = useRef(handleResize)
+    let model: Object3D | undefined
+    let isDisposed = false
+    let animationFrameId: number | undefined
+    let introStartTime: number | undefined
 
-  useEffect(() => {
-    handleResizeRef.current = handleResize
-  })
+    const camera = new OrthographicCamera(-1, 1, 1, -1, 0.01, 50000)
 
-  useEffect(() => {
-    const { current: container } = containerRef
+    const initialCameraPosition = new Vector3(20 * Math.sin(0.2 * Math.PI), 10, 20 * Math.cos(0.2 * Math.PI))
+    const cameraTarget = new Vector3(-0.5, 1.2, 0)
 
-    if (container) {
-      const width = container.clientWidth
-      const height = container.clientHeight
+    camera.position.copy(initialCameraPosition)
+    camera.lookAt(cameraTarget)
 
-      const renderer = new THREE.WebGLRenderer({
-        alpha: true,
-        antialias: true,
-      })
+    const renderer = new WebGLRenderer({
+      alpha: true,
+      antialias: true,
+    })
 
-      renderer.outputColorSpace = THREE.SRGBColorSpace
+    renderer.outputColorSpace = SRGBColorSpace
 
-      renderer.setPixelRatio(window.devicePixelRatio)
-      renderer.setSize(width, height)
+    renderer.domElement.setAttribute('aria-hidden', 'true')
 
-      container.appendChild(renderer.domElement)
+    container.appendChild(renderer.domElement)
 
-      rendererRef.current = renderer
+    const orbitControls = new OrbitControls(camera, renderer.domElement)
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    orbitControls.autoRotate = !prefersReducedMotion
+    orbitControls.maxZoom = 1
+
+    orbitControls.target.copy(cameraTarget)
+
+    const scene = new Scene()
+
+    scene.add(new AmbientLight(0xcccccc, Math.PI))
+
+    const renderScene = () => {
+      renderer.render(scene, camera)
+    }
+
+    const resizeScene = () => {
+      const { clientHeight: height, clientWidth: width } = container
 
       const cameraViewSize = height * 0.005 + 4.8
 
-      const camera = new THREE.OrthographicCamera(
-        -cameraViewSize,
-        cameraViewSize,
-        cameraViewSize,
-        -cameraViewSize,
-        0.01,
-        50000,
-      )
+      camera.top = cameraViewSize
+      camera.right = cameraViewSize
+      camera.bottom = -cameraViewSize
+      camera.left = -cameraViewSize
 
-      const cameraTarget = new THREE.Vector3(-0.5, 1.2, 0)
-      const initialCameraPosition = new THREE.Vector3(20 * Math.sin(0.2 * Math.PI), 10, 20 * Math.cos(0.2 * Math.PI))
+      camera.updateProjectionMatrix()
 
-      camera.lookAt(cameraTarget)
-      camera.position.copy(initialCameraPosition)
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, MAX_PIXEL_RATIO))
+      renderer.setSize(width, height)
 
-      const scene = new THREE.Scene()
+      if (model && prefersReducedMotion) {
+        renderScene()
+      }
+    }
 
-      const ambientLight = new THREE.AmbientLight(0xcccccc, Math.PI)
+    const resizeObserver = new ResizeObserver(resizeScene)
 
-      scene.add(ambientLight)
+    resizeObserver.observe(container)
 
-      const orbitControls = new OrbitControls(camera, renderer.domElement)
+    resizeScene()
 
-      orbitControls.autoRotate = true
-      orbitControls.maxZoom = 1
-      orbitControls.target = cameraTarget
+    if (prefersReducedMotion) {
+      orbitControls.addEventListener('change', renderScene)
+    }
 
-      let animationFrameId: number
-      let animationFrame = 0
+    const animateScene = (time: number) => {
+      if (isDisposed) {
+        return
+      }
 
-      const animateScene = () => {
-        animationFrameId = requestAnimationFrame(animateScene)
+      animationFrameId = requestAnimationFrame(animateScene)
 
-        animationFrame = animationFrame <= 100 ? animationFrame + 1 : animationFrame
+      introStartTime ??= time
 
-        if (animationFrame <= 100) {
-          const startPosition = initialCameraPosition
+      const progress = Math.min((time - introStartTime) / INTRO_DURATION_MS, 1)
 
-          const rotationAngle = -easeOutCircular(animationFrame / 120) * Math.PI * 20
+      if (progress < 1) {
+        const rotationAngle = -easeOutCircular(progress) * Math.PI * 20
 
-          camera.position.y = 10
-          camera.position.x = startPosition.x * Math.cos(rotationAngle) + startPosition.z * Math.sin(rotationAngle)
-          camera.position.z = startPosition.z * Math.cos(rotationAngle) - startPosition.x * Math.sin(rotationAngle)
+        camera.position.x =
+          initialCameraPosition.x * Math.cos(rotationAngle) + initialCameraPosition.z * Math.sin(rotationAngle)
+        camera.position.z =
+          initialCameraPosition.z * Math.cos(rotationAngle) - initialCameraPosition.x * Math.sin(rotationAngle)
 
-          camera.lookAt(cameraTarget)
-        } else {
-          orbitControls.update()
+        camera.lookAt(cameraTarget)
+      } else {
+        orbitControls.update()
+      }
+
+      renderScene()
+    }
+
+    void loadGLTFModel(scene, {
+      castShadow: false,
+      receiveShadow: false,
+    }).then(
+      (loadedModel) => {
+        if (isDisposed) {
+          disposeModel(loadedModel)
+
+          return
         }
 
-        renderer.render(scene, camera)
-      }
-
-      void loadGLTFModel(scene, {
-        castShadow: false,
-        receiveShadow: false,
-      }).then(() => {
-        animateScene()
+        model = loadedModel
 
         setIsLoading(false)
-      })
 
-      return () => {
-        cancelAnimationFrame(animationFrameId)
+        if (prefersReducedMotion) {
+          renderScene()
 
-        renderer.domElement.remove()
-        renderer.dispose()
-      }
-    }
-  }, [])
+          return
+        }
 
-  useEffect(() => {
-    const handleWindowResize = () => {
-      handleResizeRef.current()
-    }
+        animationFrameId = requestAnimationFrame(animateScene)
+      },
+      (error: unknown) => {
+        if (!isDisposed) {
+          console.error('VoxelDog could not be initialized.', error)
 
-    window.addEventListener('resize', handleWindowResize)
+          setHasError(true)
+          setIsLoading(false)
+        }
+      },
+    )
 
     return () => {
-      window.removeEventListener('resize', handleWindowResize)
+      isDisposed = true
+
+      if (animationFrameId !== undefined) {
+        cancelAnimationFrame(animationFrameId)
+      }
+
+      resizeObserver.disconnect()
+
+      if (prefersReducedMotion) {
+        orbitControls.removeEventListener('change', renderScene)
+      }
+
+      orbitControls.dispose()
+
+      if (model) {
+        disposeModel(model)
+      }
+
+      renderer.domElement.remove()
+      renderer.dispose()
+      renderer.forceContextLoss()
     }
   }, [])
 
@@ -142,6 +185,11 @@ export function VoxelDog() {
       ref={containerRef}
     >
       {isLoading && <IconLoader />}
+      {hasError && (
+        <p className="absolute inset-0 flex items-center justify-center text-center text-sm">
+          The 3D model is unavailable.
+        </p>
+      )}
     </div>
   )
 }
