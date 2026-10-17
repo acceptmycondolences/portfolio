@@ -1,0 +1,23 @@
+{
+  // Форматируем файлы через Prettier по prettier.config.js.
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  // Применяем форматирование при каждом сохранении файла.
+  "editor.formatOnSave": true,
+  // Привязываем хуки Husky без расширений к языку Shell Script для корректной подсветки синтаксиса.
+  "files.associations": {
+    "commit-msg": "shellscript",
+    "pre-commit": "shellscript"
+  },
+  // Дерево маршрутов генерирует TanStack Router, поэтому запрещаем его ручное редактирование.
+  "files.readonlyInclude": {
+    "**/generatedRouteTree.ts": true
+  },
+  // Не отслеживаем изменения файла, который перегенерируется при каждом изменении маршрутов.
+  "files.watcherExclude": {
+    "**/generatedRouteTree.ts": true
+  },
+  // Исключаем сгенерированный файл из результатов поиска.
+  "search.exclude": {
+    "**/generatedRouteTree.ts": true
+  }
+}

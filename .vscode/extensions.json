@@ -1,0 +1,15 @@
+{
+  // Предлагаем расширения, которые применяют настройки проекта прямо в редакторе.
+  "recommendations": [
+    // Подсказывает классы Tailwind CSS.
+    "bradlc.vscode-tailwindcss",
+    // Показывает ошибки по eslint.config.js.
+    "dbaeumer.vscode-eslint",
+    // Применяет .editorconfig.
+    "editorconfig.editorconfig",
+    // Форматирует по prettier.config.js.
+    "esbenp.prettier-vscode",
+    // Запускает и отлаживает тесты Vitest из редактора.
+    "vitest.explorer"
+  ]
+}

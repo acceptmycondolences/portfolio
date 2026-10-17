@@ -1,0 +1,4 @@
+# Дерево маршрутов генерирует TanStack Router в собственном формате; не переформатируем его.
+**/generatedRouteTree.ts
+# Lockfile целиком перезаписывает pnpm при каждой установке; его формат задаёт pnpm, а не Prettier.
+pnpm-lock.yaml

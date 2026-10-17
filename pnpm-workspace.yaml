@@ -1,0 +1,15 @@
+# Не устанавливаем пакеты, которые заявляют о несовместимости с текущей версией Node.js.
+engineStrict: true
+# Каталоги, в которые pnpm связывает скиллы, разрешённые зависимостям.
+skills:
+  dirs:
+    - .agents/skills
+    - .claude/skills
+# Что разрешено делать отдельным зависимостям при установке (pnpm 12.11+).
+permissions:
+  '@tanstack/router-plugin':
+    # Разрешаем pnpm связать скиллы агентов из пакета с каталогами скиллов проекта (.claude/skills и .agents/skills).
+    skills: true
+  typeit:
+    # postinstall только выводит уведомление; для работы библиотеки сборка не нужна.
+    build: false

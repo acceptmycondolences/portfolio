@@ -1,0 +1,47 @@
+# Локальные настройки IDE JetBrains
+.idea
+
+# Временные файлы генератора маршрутов TanStack Router (tsr generate)
+.tanstack
+
+# Служебные артефакты Vitest
+.vitest
+
+# Локальные настройки VS Code; общие настройки храним в репозитории
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Отчёты покрытия Vitest
+coverage
+
+# Результаты сборки
+dist
+dist-ssr
+
+# Логи
+logs
+
+# Зависимости
+node_modules
+
+# Служебный файл macOS
+.DS_Store
+
+# Локальные файлы (например, .env.local) и логи
+*.local
+*.log
+
+# Файлы проектов и локальное состояние редакторов
+*.njsproj
+*.ntvs*
+*.sln
+*.suo
+*.sw?
+
+# Логи пакетных менеджеров
+lerna-debug.log*
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*

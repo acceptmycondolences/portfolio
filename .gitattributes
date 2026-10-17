@@ -1,0 +1,2 @@
+# Определяем текстовые файлы автоматически и храним их с LF, как в EditorConfig и Prettier.
+* text=auto eol=lf
