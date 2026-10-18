@@ -47,8 +47,6 @@ export default {
   semi: false,
   // Используем одинарные кавычки в JS/TS для единого стиля кода.
   singleQuote: true,
-  // Дополнительных атрибутов для сортировки классов нет; стандартные class/className уже поддерживаются.
-  tailwindAttributes: [],
   // Сортируем классы Tailwind внутри вызовов classNames().
   tailwindFunctions: ['classNames'],
   // Берём тему и утилиты Tailwind v4 из входного CSS файла проекта.

@@ -144,7 +144,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Алиас `~/*` → `src/*` задан только в `tsconfig.app.json`; Vite читает его через `resolve.tsconfigPaths`. Не дублируй алиас в других конфигах.
 - В конфигах, которые поддерживают комментарии, каждая настройка сопровождается комментарием на русском, который объясняет, зачем она нужна. В `package.json`, `tsr.config.json` и `.nvmrc` комментарии невозможны. В `eslint.config.js` пометка «Дополнение:» отмечает то, чего нет в шаблоне Vite. Обычные комментарии ставятся выше JSDoc `@type`, а не между ним и `export default`.
 - Порядок импортов задаёт Prettier (`@ianvs/prettier-plugin-sort-imports`, группы по слоям FSD), поэтому правила сортировки импортов в Perfectionist отключены.
-- Не добавляй настройки, которые совпадают со значениями по умолчанию (например, `strict`: в TypeScript 6+ он включён по умолчанию). Значения из шаблона Vite в `tsconfig*.json` сохраняются как есть. Осознанные исключения — `tailwindAttributes: []` и `'decorators-legacy'` в `prettier.config.js`.
+- Не добавляй настройки, которые совпадают со значениями по умолчанию (например, `strict` и `module: esnext` в TypeScript 6+). Значения из шаблона Vite в `tsconfig*.json` сохраняются, только если меняют поведение. В `prettier.config.js` сохраняй `'decorators-legacy'` для сортировки импортов.
 - В JS/TS-конфигах ключи объектов сортируются по алфавиту, это проверяет Perfectionist. В JSON порядок не проверяется: в `tsconfig*.json` сохранён порядок из шаблона Vite, `scripts` в `package.json` сгруппированы по смыслу, остальные JSON-файлы (`.vscode/*`, `tsr.config.json`) отсортированы по алфавиту.
 
 ## Ревизия инструкций для ИИ
