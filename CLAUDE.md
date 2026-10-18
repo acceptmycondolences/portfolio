@@ -11,13 +11,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 | Команда                             | Что делает                                                                                    | Меняет файлы                  |
 | ----------------------------------- | --------------------------------------------------------------------------------------------- | ----------------------------- |
-| `pnpm dev`                          | Dev-сервер Vite на порту 3000 с доступом из сети (настроено в `vite.config.ts`)               | Только дерево маршрутов       |
-| `pnpm build`                        | `pnpm check`, затем `vite build`                                                              | `dist/`, дерево маршрутов     |
-| `pnpm preview`                      | Просмотр сборки на порту 3000                                                                 | Нет                           |
-| `pnpm check`                        | `format:check` → `lint` → `types:check` → `arch:check` → `test:run`; падает на первой ошибке  | Только дерево маршрутов       |
-| `pnpm fix`                          | `format` → `lint:fix`                                                                         | **Да**                        |
 | `pnpm format` / `pnpm format:check` | Prettier: форматирование / проверка                                                           | Да / Нет                      |
 | `pnpm lint` / `pnpm lint:fix`       | ESLint с `--max-warnings 0` / автоисправление                                                 | Нет / **Да**                  |
+| `pnpm fix`                          | `format` → `lint:fix`                                                                         | **Да**                        |
 | `pnpm routes:generate`              | `tsr generate`: перегенерирует дерево маршрутов из `src/app/routes`                           | Только дерево маршрутов       |
 | `pnpm types:check`                  | `routes:generate`, затем `tsc -b` по references из `tsconfig.json`                            | Только дерево маршрутов       |
 | `pnpm arch:check`                   | steiger: проверка архитектуры Feature-Sliced Design в `src`                                   | Нет                           |
@@ -25,6 +21,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | `pnpm test:run`                     | Однократный прогон всех тестов                                                                | Только дерево маршрутов       |
 | `pnpm test:coverage`                | Однократный прогон с покрытием v8, отчёт в `coverage/`                                        | `coverage/`, дерево маршрутов |
 | `pnpm test:browsers`                | Скачивает Chromium для установленной версии Playwright во внешний кэш                         | Внешний кэш                   |
+| `pnpm check`                        | `format:check` → `lint` → `types:check` → `arch:check` → `test:run`; падает на первой ошибке  | Только дерево маршрутов       |
+| `pnpm dev`                          | Dev-сервер Vite на порту 3000 с доступом из сети (настроено в `vite.config.ts`)               | Только дерево маршрутов       |
+| `pnpm build`                        | `pnpm check`, затем `vite build`                                                              | `dist/`, дерево маршрутов     |
+| `pnpm preview`                      | Просмотр сборки на порту 3000                                                                 | Нет                           |
+| `pnpm prepare`                      | `pnpm install` запускает команду автоматически; настраивает Git-хуки Husky                    | `.husky/_`                    |
 | `pnpm deps:update`                  | Обновляет зависимости (см. «Обновление зависимостей»); при ошибке пытается откатить изменения | **Да**                        |
 
 Служебные кэши инструментов в колонке «Меняет файлы» не перечислены. Проверки по одному файлу: `pnpm exec eslint --max-warnings 0 <путь>`, `pnpm exec prettier --check <путь>`, `pnpm exec vitest run <путь>`. Типы и архитектура проверяются только целиком (`pnpm types:check`, `pnpm arch:check`).
@@ -71,7 +72,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Vitest сам определяет Claude Code (переменная `CLAUDECODE`) и включает компактный репортёр `minimal`: выводятся только упавшие тесты. Поэтому `reporters` в конфиге не задаётся — иначе автоопределение отключится.
 - Для подробного вывода по одному файлу: `pnpm exec vitest run <путь> --reporter=verbose`.
 - Проверяй код завершения и весь итог прогона: прошедшие тесты и 100% покрытия не означают успех, если Vitest сообщил `Unhandled Errors` или `Unhandled Rejection`.
-- Предупреждение `Vite unexpectedly reloaded a test` появляется один раз, когда browser-тест впервые импортирует зависимость, которой ещё нет в кэше Vite. Если тест из-за этого упал, перезапусти его. Не добавляй `optimizeDeps.include` по совету из предупреждения: Vitest сам сканирует тестовые файлы через `optimizeDeps.entries`, и при чистом кэше (в CI) перезагрузки нет.
+- Предупреждение `Vite unexpectedly reloaded a test` означает, что Vite переоптимизировал зависимости и перезагрузил среду browser-теста; это может привести к падению, повторному запуску или нестабильности теста. Сначала проверь, повторяется ли проблема. Не добавляй `optimizeDeps.include` только ради устранения предупреждения: сначала обоснуй добавление конкретной зависимости и проверь поведение с чистым кэшем и в CI.
 
 ### Образцы тестов
 
@@ -145,7 +146,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - В конфигах, которые поддерживают комментарии, каждая настройка сопровождается комментарием на русском, который объясняет, зачем она нужна. В `package.json`, `tsr.config.json` и `.nvmrc` комментарии невозможны. В `eslint.config.js` пометка «Дополнение:» отмечает то, чего нет в шаблоне Vite. Обычные комментарии ставятся выше JSDoc `@type`, а не между ним и `export default`.
 - Порядок импортов задаёт Prettier (`@ianvs/prettier-plugin-sort-imports`, группы по слоям FSD), поэтому правила сортировки импортов в Perfectionist отключены.
 - Не добавляй настройки, которые совпадают со значениями по умолчанию (например, `strict` и `module: esnext` в TypeScript 6+). Значения из шаблона Vite в `tsconfig*.json` сохраняются, только если меняют поведение. В `prettier.config.js` сохраняй `'decorators-legacy'` для сортировки импортов.
-- В JS/TS-конфигах ключи объектов сортируются по алфавиту, это проверяет Perfectionist. В JSON порядок не проверяется: в `tsconfig*.json` сохранён порядок из шаблона Vite, `scripts` в `package.json` сгруппированы по смыслу, остальные JSON-файлы (`.vscode/*`, `tsr.config.json`) отсортированы по алфавиту.
+- В JS/TS-конфигах ключи объектов сортируются в естественном алфавитном порядке; это проверяет `perfectionist/sort-objects`. В JSON порядок не проверяется: в `tsconfig*.json` сохранён порядок из шаблона Vite, `scripts` в `package.json` сгруппированы по смыслу, остальные JSON-файлы (`.vscode/*`, `tsr.config.json`) отсортированы по алфавиту.
 
 ## Ревизия инструкций для ИИ
 
